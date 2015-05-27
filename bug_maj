@@ -1,0 +1,145 @@
+ 
+ 
+ SELECT g.id, p.id AS id_piece,g.ref,g.indice,g.designation,gfab.nom as nom_fab,g.id_affaire_type,gc.nom as nom_cat,gfam.nom as nom_fam,pa.nom as nom_pa,e.nom as nom_e,sum(p.is_facturation) as tot
+FROM gamme g
+LEFT JOIN gamme_fab gfab ON gfab.id=g.id_fab
+LEFT JOIN gamme_cat gc ON gc.id=g.id_cat
+LEFT JOIN gamme_famille gfam ON gfam.id=g.id_famille
+LEFT JOIN piece_avion pa ON pa.id=g.id_avion
+LEFT JOIN entite e ON e.id=g.id_entite
+LEFT JOIN phase p ON p.id_gamme=g.id
+LEFT JOIN piece pi ON pi.id=g.id_piece
+WHERE pi.actif=1
+GROUP BY g.id
+HAVING tot=0
+ 
+ 
+ SELECT a.id_piece, p.id_fab
+FROM affaire_prev ap
+LEFT JOIN affaire a ON a.id = ap.id_affaire
+LEFT JOIN piece p ON a.id_piece = p.id
+WHERE ap.prev_ps =1
+AND year( ap.d_cde ) =2014
+ 
+ 
+ SELECT a.id_piece , p.id_fab
+FROM affaire_prev ap
+LEFT JOIN affaire a ON a.id =ap.id_affaire
+LEFT JOIN piece p ON a.id_piece =p.id
+WHERE ap.prev_ps=1 and year(ap.d_cde) = 2014
+ 
+ 
+SELECT g.ref,g.indice,g.designation,gfab.nom as nom_fab,g.id_affaire_type,gc.nom as nom_cat,gfam.nom as nom_fam,pa.nom as nom_pa,e.nom as nom_e,sum(p.is_livraison) as tot
+FROM gamme g
+LEFT JOIN gamme_fab gfab ON gfab.id=g.id_fab
+LEFT JOIN gamme_cat gc ON gc.id=g.id_cat
+LEFT JOIN gamme_famille gfam ON gfam.id=g.id_famille
+LEFT JOIN piece_avion pa ON pa.id=g.id_avion
+LEFT JOIN entite e ON e.id=g.id_entite
+LEFT JOIN phase p ON p.id_gamme=g.id
+LEFT JOIN piece pi ON pi.id=g.id_piece
+WHERE pi.actif=1 and p.id_affaire_type = 1
+GROUP BY g.id
+HAVING tot=0
+
+
+SELECT g.id, p.id AS id_piece,g.ref,g.indice,g.designation,gfab.nom as nom_fab,g.id_affaire_type,gc.nom as nom_cat,gfam.nom as nom_fam,pa.nom as nom_pa,e.nom as nom_e,sum(p.is_facturation) as tot
+FROM gamme g
+LEFT JOIN gamme_fab gfab ON gfab.id=g.id_fab
+LEFT JOIN gamme_cat gc ON gc.id=g.id_cat
+LEFT JOIN gamme_famille gfam ON gfam.id=g.id_famille
+LEFT JOIN piece_avion pa ON pa.id=g.id_avion
+LEFT JOIN entite e ON e.id=g.id_entite
+LEFT JOIN phase p ON p.id_gamme=g.id
+LEFT JOIN piece pi ON pi.id=g.id_piece
+WHERE pi.actif=1
+GROUP BY g.id
+HAVING tot=0
+
+//
+SELECT g.id, p.id AS id_piece,of.ref,of.indice,of.designation,gfab.nom as nom_fab,of.id_affaire_type,gc.nom as nom_cat,gfam.nom as nom_fam,pa.nom as nom_pa,e.nom as nom_e,sum(pi.is_facturation) as tot
+FROM of
+LEFT JOIN phase_i pi ON pi.id_of=of.id
+LEFT JOIN gamme_fab gfab ON gfab.id=of.id_fab
+LEFT JOIN gamme_cat gc ON gc.id=of.id_cat
+LEFT JOIN gamme_famille gfam ON gfam.id=of.id_famille
+LEFT JOIN piece_avion pa ON pa.id=of.id_avion
+LEFT JOIN entite e ON e.id=of.id_entite
+GROUP BY of.ref
+HAVING tot=0
+
+
+
+
+
+
+ SELECT p.date, p.mat, i.nom, i.prenom, sec_to_time(sum(time_to_sec(p.h_t)))as h_t, h.horo_reel, h.horo_valide, sec_to_time(time_to_sec(h.horo_reel)- sum(time_to_sec(p.h_t))) as diff_reel, sec_to_time(time_to_sec(h.horo_valide)-sum(time_to_sec(p.h_t))) as diff_valide 
+ FROM pointage p 
+ LEFT JOIN interne i ON p.id_interne = i.id 
+ LEFT JOIN horoquartz h ON h.badge_movex = i.badge_movex and h.date = p.date 
+ WHERE 1 and h.date between '2014-11-19' and '2014-12-16' and h.id is not null GROUP BY p.mat , p.date , h.date ORDER BY diff_valide asc , p.mat ASC , h.date DESC 
+ 
+ 
+ 
+ SELECT ora.* , of.quantite_ok , of.is_rapprochement , ap.qte , ap.is_rapprochement
+	FROM of_rapprochement ora
+	LEFT JOIN of ON of.id=ora.id_of
+	LEFT JOIN affaire_prev ap ON ap.id=ora.id_affaire_prev
+	WHERE ((of.numero_client <> ap.n_cde_c OR of.poste <> ap.poste) AND of.numero_client <> '' AND of.poste <> '0') OR of.of_client <> ap.of_client
+ 
+ 
+id 	cde_client 	poste 	of_client 	qte 	id_of 	id_affaire_prev 	quantite_ok 	is_rapprochement 	qte 	is_rapprochement
+3500 	  	0 	45171039 	4 	297904 	220758 	4 	4 	4.000 	4
+
+ select * from of where id = 297904;
+ select * from affaire_prev where id = 220758;
+ 
+select pi.id_affaire , pi.id_of , pi.id , pi.numero , pi.id_gt , pi.gt_code , pi.tx_gt , pi.tps_devis , pi.tps_reel, pi.prix_vente , pi.avt , pi.designation , sum(time_to_sec(p.h_t))/3600
+from phase_i pi
+right join pointage p on pi.id = p.id_phase_i
+left join affaire a on pi.id_affaire = a.id
+where a.type = 2 and p.date between '2014-03-12' and '2014-12-31' and p.type = 0
+group by pi.id
+
+sum(time_to_sec(p.h_t))/3600
+
+time_to_sec(sum(time_to_sec(p.h_t)))
+Array
+(
+    [0] => Nov 18 2014 12:00:00:000AM
+    [DATTRAI] => Nov 18 2014 12:00:00:000AM
+    [1] => 132
+    [Code_Etablissement] => 132
+    [2] => Mk Atlantique Ste Luce
+    [LIBELLE_SOCIETE] => Mk Atlantique Ste Luce
+    [3] => 00100295
+    [MATRI] => 00100295
+    [4] => FOUCAULT NICOLAS
+    [NOMPRE] => FOUCAULT NICOLAS
+    [5] => UAP 1
+    [LIBCOURT] => UAP 1
+    [6] => 4088
+    [ENTREE_REEL_1] => 4088
+    [7] => 500
+    [SORTIE_REEL_1] => 500
+    [8] => 0
+    [ENTREE_REEL_2] => 0
+    [9] => 0
+    [SORTIE_REEL_2] => 0
+    [10] => *H00
+    [ENTREE_VALIDE_1] => *H00
+    [11] => 29H00
+    [SORTIE_VALIDE_1] => 29H00
+    [12] => 00H00
+    [ENTREE_VALIDE_2] => 00H00
+    [13] => 00H00
+    [SORTIE_VALIDE_2] => 00H00
+)
+
+bikowsky 0277 entrée :66:00:00 -> 29:00:00 
+
+update of set is_rapprochement = quantite_ok where year(d_fin_sap) < 2014;
+update affaire_prev set is_rapprochement = qte where year(d_cde) < 2014 and prev_ps = 1;
+
+update of set is_rapprochement = 0 where year(d_fin_sap) >= 2014;
+update affaire_prev set is_rapprochement = 0 where year(d_cde) >= 2014 and prev_ps = 1;
